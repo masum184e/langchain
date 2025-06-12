@@ -400,6 +400,10 @@ Generate a JSON object for a user with:
   - [How To](https://python.langchain.com/docs/how_to/)
 - [Providers Features](https://python.langchain.com/docs/integrations/chat/#featured-providers)
 - For large dataset use `lazy_load` instead of `load`
+- Tools
+  - Runnable Interface
+  - invoke
+  - ainvoke
 # JSON Support
 
 - Few Shot Prompt Template
