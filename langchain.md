@@ -404,6 +404,7 @@ Generate a JSON object for a user with:
   - Runnable Interface
   - invoke
   - ainvoke
+- what's the differences between structured and unstrutured data in langchain
 # JSON Support
 
 - Few Shot Prompt Template
