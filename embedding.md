@@ -1,3 +1,24 @@
+- [Embedding](#embedding)
+  - [Methods](#methods)
+    - [`embed_documents()`](#embed_documents)
+    - [`embed_query()`](#embed_query)
+  - [Summary](#summary)
+- [Vector Store](#vector-store)
+  - [Why use vector store?](#why-use-vector-store)
+  - [Methods](#methods-1)
+    - [FAISS](#faiss)
+      - [FAISS in LangChain](#faiss-in-langchain)
+      - [Features](#features-of-faiss)
+      - [Example](#example)
+      - [Saving](#saving)
+      - [FAISS Index Types](#faiss-index-types-advanced)
+    - [Chroma](#chroma)
+      - [Chroma in LangChain](#chroma-in-langchain)
+      - [Features](#features-of-chroma)
+      - [Example](#example-1)
+      - [Saving](#saving-1)
+      - [When to Use Chroma?](#when-to-use-chroma)
+
 # Embedding
 
 An embedding is a fixed-size vector representation of text (words, sentences, or documents). It captures semantic meaning—so that similar texts result in similar vectors.
@@ -134,7 +155,7 @@ Suppose you're building a QA system over your PDF notes. You:
 
 ## Methods
 
-### FASIS
+### FAISS
 
 FAISS (Facebook AI Similarity Search) is an open-source library developed by Facebook AI for efficient similarity search and clustering of dense vectors. It's widely used for building fast, scalable, and memory-efficient vector databases, particularly for applications like:
 
@@ -154,7 +175,7 @@ LangChain wraps FAISS with an easy-to-use interface that:
 
 LangChain abstracts the FAISS indexing and retrieval mechanisms so you can use it with minimal setup.
 
-#### Features
+#### Features of FAISS
 
 | Feature                                      | Description                                                          |
 | -------------------------------------------- | -------------------------------------------------------------------- |
@@ -173,7 +194,8 @@ vectorstore = FAISS.from_documents(documents, embedding_model)
 
 - `doucments` - Chunk document splitted by `CharacterTextSplitter`.
 - `embedding_model` - Embedding model.
-  **Extended Example:**
+
+**Extended Example:**
 
 ```py
 docs = [
@@ -243,7 +265,7 @@ Chroma is especially useful when you want:
 - Metadata handling
 - Tight integration with LangChain
 
-#### Features
+#### Features of Chroma
 
 | Feature                                       | Description                             |
 | --------------------------------------------- | --------------------------------------- |

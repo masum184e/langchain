@@ -1,3 +1,12 @@
+- [Tools](#tools)
+  - [Components](#components)
+  - [Example](#example)
+- [Agent](#agent)
+  - [Components](#components-1)
+  - [Types of Agent](#types-of-agent)
+  - [Example](#example-1)
+  - [Summary](#summary)
+
 # Tools
 
 Tools in LangChain are **wrappers around functions** that a **llm can call** through agents.
@@ -106,9 +115,10 @@ print(result)
 Agents can also maintain context across turns. Use `agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION` and now it can remember previous messages — useful for chatbots and assistants.
 
 ## Summary
+
 | Concept          | Description                                                                  |
 | ---------------- | ---------------------------------------------------------------------------- |
 | **Tool**         | A callable function with a name and description                              |
-| **Agent**        | The brain that decides *when* and *how* to call a tool                       |
+| **Agent**        | The brain that decides _when_ and _how_ to call a tool                       |
 | **Tool Calling** | The process of the agent invoking external functions                         |
 | **LLM Role**     | Parses, plans, and calls tools as needed based on prompt + tool descriptions |
