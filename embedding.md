@@ -282,6 +282,16 @@ Chroma is especially useful when you want:
 vectorstore = Chroma.from_documents(documents, embedding_model, persist_directory="chroma_db")
 ```
 
+**Metadata Filtering:**
+
+```py
+results = vectorstore.similarity_search(
+    "RAG systems",
+    k=2,
+    filter={"source": "doc_2"}  # Only return matches from this doc
+)
+```
+
 #### Saving
 
 Chroma persists automatically if you set `persist_directory`.

@@ -405,6 +405,7 @@ Generate a JSON object for a user with:
   - invoke
   - ainvoke
 - what's the differences between structured and unstrutured data in langchain
+- Explore all the parameter of fewshotprompt template
 # JSON Support
 
 - Few Shot Prompt Template
