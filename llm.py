@@ -8,6 +8,9 @@ llm = GoogleGenerativeAI(model="gemini-2.0-flash")
 
 # Send a simple string prompt
 prompt = "List three benefits of drinking green tea."
-response = llm.invoke(prompt)
+response = llm.stream(prompt)
 
-print("LLM response:\n", response)
+for res in response:
+    print(res)
+
+# print("LLM response:\n", response)

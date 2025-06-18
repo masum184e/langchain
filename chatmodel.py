@@ -14,5 +14,10 @@ messages = [
 ]
 
 # Get response
-response = llm.invoke(messages)
-print("ChatModel response:\n", response.content)
+# response = llm.invoke(messages)
+# print("ChatModel response:\n", response.content)
+
+response = llm.stream(messages)
+
+for res in response:
+    print(res.content, end='', flush=True)
