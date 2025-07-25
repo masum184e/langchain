@@ -5,7 +5,7 @@
   - [Components](#components-1)
   - [Types of Agent](#types-of-agent)
   - [Example](#example-1)
-  - [Summary](#summary)
+  - [Running Agents](#running-agents)
 
 # Tools
 
@@ -55,6 +55,7 @@ add_tool = Tool(
 ```py
 @tool
 def add_numbers(inputs: str) -> str:
+    """Add two numbers."""
     a, b = map(int, inputs.split(","))
     return str(a + b)
 ```
@@ -67,7 +68,9 @@ You can also inspect the tools property such `add_numbers.name`, `add_numbers.de
 
 LLM can't take actions - they just output text. Agents are systems that **take a high-level task** and **use an LLM as a reasoning engine** to **decide what actions to take** and execute those actions.
 
-LangGraph is an extension of LangChain specifically aimed at creating highly controllable and customizable agents. It is recommended to use LangGraph for building agents.
+An agent consists of three components: a large language model (LLM), a set of tools it can use, and a prompt that provides instructions.
+
+The LLM operates in a loop. In each iteration, it selects a tool to invoke, provides input, receives the result (an observation), and uses that observation to inform the next action. The loop continues until a stopping condition is met — typically when the agent has gathered enough information to respond to the user.
 
 **Agents can:**
 
@@ -75,6 +78,7 @@ LangGraph is an extension of LangChain specifically aimed at creating highly con
 - Choose tools dynamically.
 - Handle multi-step reasoning.
 - Perform intermediate reasoning steps with context.
+- Perform just the specific job either define in the `tool` or in `prompt`.
 
 ## Components
 
@@ -83,42 +87,63 @@ LangGraph is an extension of LangChain specifically aimed at creating highly con
 3. **Agent Type**: Strategy that defines how the agent thinks and acts.
 4. **Memory (optional)**: Keeps history of past interactions.
 
-## Types of Agent
-
-| Agent Type                              | Description                                                         |
-| --------------------------------------- | ------------------------------------------------------------------- |
-| `ZERO_SHOT_REACT_DESCRIPTION`           | Simple, effective agent that chooses tools using tool descriptions. |
-| `OPENAI_FUNCTIONS`                      | Leverages OpenAI’s native function-calling interface.               |
-| `STRUCTURED_CHAT_ZERO_SHOT_REACT`       | Similar to ZERO_SHOT but with structured input/output.              |
-| `CHAT_CONVERSATIONAL_REACT_DESCRIPTION` | For multi-turn conversations with memory.                           |
-
 ## Example
 
 **Initialize an agent with the tool:**
 
 ```py
-agent = initialize_agent(
-    tools=[add_tool],
-    llm=llm,
-    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-    verbose=True
+agent = create_react_agent(
+    model=llm,
+    tools=[add_numbers],
+    prompt="You are a helpful assistant"
 )
 ```
 
-**Run the Agent:**
+`initialize_agent` was designed for sequential tasks and straightforward workflows. The LLM would decide on a tool, use it, observe the output, and then decide on the next step, all within a relatively rigid, linear "chain" of operations. While it could iterate, it wasn't designed for arbitrary, dynamic graph structures.
+
+`create_react_agent` designed for non-linear workflows that involve loops and human-in-the-loop interactions. The ReAct pattern (Reason, Act, Observe, and then loop) is naturally represented as a cycle within a LangGraph.
+
+## Running Agents
+
+### Basic Usage
+
+Agents can be executed in two primary modes:
+
+- Synchronous using `.invoke()` or `.stream()`
+- Asynchronous using `await .ainvoke()` or `async for` with `.astream()`
 
 ```py
-result = agent.run("What is the result of adding 10 and 22?")
-print(result)
+response = agent.invoke({"messages": [{"role": "user", "content": "what is the weather in sf"}]})
 ```
 
-Agents can also maintain context across turns. Use `agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION` and now it can remember previous messages — useful for chatbots and assistants.
+### Inputs and Output
 
-## Summary
+Agents use a language model that expects a list of `messages` as an input. Therefore, agent inputs and outputs are stored as a list of `messages` under the `messages` key in the agent state.
 
-| Concept          | Description                                                                  |
-| ---------------- | ---------------------------------------------------------------------------- |
-| **Tool**         | A callable function with a name and description                              |
-| **Agent**        | The brain that decides _when_ and _how_ to call a tool                       |
-| **Tool Calling** | The process of the agent invoking external functions                         |
-| **LLM Role**     | Parses, plans, and calls tools as needed based on prompt + tool descriptions |
+#### Input Format
+
+Agent input must be a dictionary with a `messages` key. Supported formats are:
+| Format | Example |
+|---------------------|-------------------------------------------------------------------------------------------|
+| String | `{"messages": "Hello"}` — Interpreted as a `HumanMessage` |
+| Message dictionary | `{"messages": {"role": "user", "content": "Hello"}}` |
+| List of messages | `{"messages": [{"role": "user", "content": "Hello"}]}` |
+| With custom state | `{"messages": [{"role": "user", "content": "Hello"}], "user_name": "Alice"}` — If using a `custom state_schema` |
+
+#### Output Format
+
+Agent output is a dictionary containing:
+
+- `messages`: A list of all messages exchanged during execution (user input, assistant replies, tool invocations).
+- Optionally, `structured_response` if structured output is configured.
+- If using a custom `state_schema`, additional keys corresponding to your defined fields may also be present in the output. These can hold updated state values from tool execution or prompt logic.
+
+#### Streaming
+
+```py
+for chunk in agent.stream(
+    {"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+    stream_mode="updates"
+):
+    print(chunk)
+```
